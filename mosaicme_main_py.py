@@ -1,8 +1,8 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 Created on Tue Jun 18 14:25:28 2019
 
-@author: Administrator
+@author: evans
 """
 
 
@@ -214,12 +214,6 @@ class MosaicMaker(object):
 
  
     # 计算平均rgb值
-    # @staticmethod
-    # def __cal_avg_rgb(im):
-    #     if im.mode != "RGB":
-    #         im = im.convert("RGB")
-    #     pix = im.load()
-    #     return tools.cal_avg_rgb(im.size[0],im.size[1],pix)
     @staticmethod
     def __cal_avg_rgb(im):
         if im.mode != "RGB":
@@ -252,31 +246,24 @@ class MosaicMaker(object):
         __all_img = self.__all_img
         vec2 = []
         keymap = dict()
-        final_keys = []
-        a,b,c = sub_rgb.split("-")
-        vec1 = np.sum([float(a),float(b),float(c)])
+        sub_r, sub_g, sub_b = sub_rgb.split("-")
+        vec1 = np.sum([float(sub_r),float(sub_g),float(sub_b)])
         for key in __all_img.keys():
             src_r, src_g, src_b = key.split("-")
             rgbsum = np.sum([float(src_r), float(src_g), float(src_b)])
             vec2.append(rgbsum)
             keymap.update({key: rgbsum})
-
         subtract = np.fabs(np.subtract(vec1,vec2))
         subtract = subtract.tolist()
 
         keymapitems = keymap.items()   
-        #for x in keymapitems:  
-        keymapitems = list(keymapitems) # keymap.items, 把字典keymap变成元组列表后迭代它，[('r-g-b','图片对象数据...')]
+        keymapitems = list(keymapitems) # keymap.items, 把字典keymap变成元组列表后迭代它，[('125.32445-1233454535-15532432',366.396711432255),('r-g-b',366.396711432255),...]
         for y, element in enumerate(subtract): 
-
             keymap[ keymapitems[y][0] ] = element   # keymapitems[y][0],即keymap字典的key
-        subtract.sort()
-        first_three_items = [subtract[0],subtract[1],subtract[2]] #找出最小的前三个差值
-        for z in keymap:
-            if keymap[z] in first_three_items:
-                final_keys.append(z)
 
-        final_key = random.choice(final_keys)
+        subtract.sort()
+        final_val = random.choice(subtract[:3])  #找出最小的前三个差值,即[subtract[0],subtract[1],subtract[2]]，幷随机取一个
+        final_key = [z for z in keymap if keymap[z] == final_val][0]
         return self.__all_img[final_key]
 
     # def __find_by_rgb(self, sub_rgb):
